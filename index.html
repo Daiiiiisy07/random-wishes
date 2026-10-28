@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>给你一句祝福</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: #fff; color: #171717;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    display: grid; place-items: center; padding: 28px;
+  }
+  main { width: min(680px, 100%); text-align: center; }
+  .eyebrow {
+    color: #888; font-size: 12px; letter-spacing: .22em; margin-bottom: 28px;
+  }
+  h1 { font-size: clamp(25px, 5vw, 36px); font-weight: 500; letter-spacing: .06em; margin: 0 0 14px; }
+  .subtitle { color: #888; font-size: 14px; margin: 0 0 52px; }
+  .quote-wrap {
+    min-height: 210px; display: flex; align-items: center; justify-content: center;
+    padding: 32px 18px; border-top: 1px solid #ededed; border-bottom: 1px solid #ededed;
+  }
+  .quote {
+    max-width: 570px; font-size: clamp(20px, 4vw, 27px); line-height: 1.95;
+    font-weight: 400; letter-spacing: .035em; transition: opacity .18s ease;
+  }
+  .quote.fade { opacity: 0; }
+  .number { color: #999; font-size: 12px; letter-spacing: .16em; margin-top: 22px; }
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+  button {
+    border: 1px solid #222; border-radius: 999px; background: #171717; color: #fff;
+    padding: 13px 25px; font: inherit; font-size: 14px; cursor: pointer;
+    transition: background .2s, color .2s, transform .2s;
+  }
+  button:hover { background: #fff; color: #171717; }
+  button:active { transform: scale(.98); }
+  button.secondary { background: #fff; color: #333; border-color: #ddd; }
+  button.secondary:hover { border-color: #222; }
+  .hint { margin-top: 42px; font-size: 12px; color: #aaa; letter-spacing: .08em; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">A LITTLE WISH FOR YOU</div>
+  <h1>给你一句祝福</h1>
+  <p class="subtitle">愿你在某个瞬间，刚好收到想听的话。</p>
+  <section class="quote-wrap" aria-live="polite">
+    <div class="quote" id="quote">希望你一切都好，希望所有俗套的祝福语，都能在你身上灵验。</div>
+  </section>
+  <div class="number" id="number">01 / 10</div>
+  <div class="actions">
+    <button id="next">再抽一句 ↗</button>
+    <button class="secondary" id="copy">复制这句</button>
+  </div>
+  <div class="hint">TAKE WHAT YOU NEED · KEEP WHAT YOU LOVE</div>
+</main>
+<script>
+const wishes = [
+  "希望你一切都好，希望所有俗套的祝福语，都能在你身上灵验。",
+  "愿你所求皆如愿，所行皆坦途，多喜乐，长安宁，在平凡的日子里也能收获不平凡的幸福。",
+  "希望你永远有重新开始的勇气，有说走就走的底气，也有即使生活不尽如意，依然爱自己的能力。",
+  "愿你不被年龄催促，不被世俗定义，在自己的时区里，慢慢走，慢慢成为自己喜欢的大人。",
+  "希望你赚得到钱，也享受得到生活；有人爱你，也有能力独处；有奔赴远方的野心，也有安于当下的松弛。",
+  "愿你一路都有鲜花，也有披荆斩棘的力量；愿你偶尔迷茫，但从不失去方向，兜兜转转，终能抵达想去的地方。",
+  "希望生活对你温柔一点，再温柔一点。让你的努力有回响，让你的真心被珍惜，让你熬过的每一个夜晚，都在未来有迹可循。",
+  "愿你有好运气，也有好心态；有惊喜，也有期待。即使偶尔觉得人生不过如此，也总能在某个瞬间重新觉得，人间值得。",
+  "希望你不必事事争先，也不必时时优秀。累了就休息，难过就哭一场，想要的就努力争取，不想要的就坦然放下。",
+  "愿你在往后的岁月里，既有乘风破浪的自由，也有停下来拥抱生活的闲暇。愿你历经千帆，仍觉人间值得；尝遍百味，依然心怀热爱。"
+];
+let current = 0;
+const quote = document.getElementById("quote");
+const number = document.getElementById("number");
+function show(index) {
+  quote.classList.add("fade");
+  window.setTimeout(() => {
+    current = index;
+    quote.textContent = wishes[current];
+    number.textContent = String(current + 1).padStart(2, "0") + " / 10";
+    quote.classList.remove("fade");
+  }, 150);
+}
+document.getElementById("next").addEventListener("click", () => {
+  let next = Math.floor(Math.random() * (wishes.length - 1));
+  if (next >= current) next++;
+  show(next);
+});
+document.getElementById("copy").addEventListener("click", async () => {
+  const btn = document.getElementById("copy");
+  try {
+    await navigator.clipboard.writeText(wishes[current]);
+    btn.textContent = "已复制 ✓";
+    setTimeout(() => btn.textContent = "复制这句", 1400);
+  } catch {
+    const area = document.createElement("textarea");
+    area.value = wishes[current]; document.body.appendChild(area);
+    area.select(); document.execCommand("copy"); area.remove();
+    btn.textContent = "已复制 ✓";
+    setTimeout(() => btn.textContent = "复制这句", 1400);
+  }
+});
+</script>
+</body>
+</html>
